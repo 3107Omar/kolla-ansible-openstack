@@ -97,9 +97,3 @@ docker container restart <container ID of horizon>
 ## to get credentials run
   cat /etc/kolla/admin-openrc.sh
   and use admin as username and get the value of export OS_PASSWORD= and use it on password field
-  
-  
-
-
-
-
