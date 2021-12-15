@@ -34,34 +34,38 @@ cp /usr/local/share/kolla-ansible/ansible/inventory/* .
 host_key_checking=False
 pipelining=True
 forks=100
-## Kolla passwords
-## Passwords used in our deployment are stored in /etc/kolla/passwords.yml file. All passwords are blank in this file and have to be filled ##either manually or by running ## random password generator
+## Kolla passwords: Passwords used in our deployment are stored in /etc/kolla/passwords.yml file. All passwords are blank in this file and have to be filled ##either manually or by running random password generator
+
 kolla-genpwd
-## Kolla globals.yml
-## globals.yml is the main configuration file for Kolla Ansible. There are a few options that are required to deploy Kolla Ansible:
-## Image options
+
+## Kolla globals.yml, globals.yml is the main configuration file for Kolla Ansible. There are a few options that are required to deploy Kolla Ansible:Image options
 ## User has to specify images that are going to be used for our deployment. In this guide DockerHub provided pre-built images are going to be ##used
 ## Kolla provides choice of several Linux distributions in containers:
-## CentOS Stream (centos)
-## Ubuntu (ubuntu)
-## Debian (debian)
-## RHEL (rhel, deprecated)
+
+CentOS Stream (centos)
+Ubuntu (ubuntu)
+Debian (debian)
+RHEL (rhel, deprecated)
+
 ## For newcomers, we recommend to use CentOS Stream 8 or Ubuntu 20.04.
 kolla_base_distro: "centos"
 kolla_install_type: "source"
-## Networking
-## Kolla Ansible requires a few networking options to be set. We need to set network interfaces used by OpenStack.
+
+## Networking Kolla Ansible requires a few networking options to be set. We need to set network interfaces used by OpenStack.
 ## First interface to set is “network_interface”. This is the default interface for multiple management-type networks.
+
 network_interface: "enp0s3"
+
 ## Second interface required is dedicated for Neutron external (or public) networks, can be vlan or flat, depends on how the networks are ##created. This interface should be active without IP address. If not, instances won’t be able to access to the external networks.
 
 neutron_external_interface: "enp0s8"
 
 ## Next we need to provide floating IP for management traffic. This IP will be managed by keepalived to provide high availability, and should ##be set to be not used address in management network that is connected to our network_interface.
+
 kolla_internal_vip_address: "10.0.0.240" ## note this address should be in the same network of your router or host
 
 ## Enable additional services
-## By default Kolla Ansible provides a bare compute kit, however it does provide support for a vast selection of additional services. To ##enable them, set enable_* to “yes”. ## For example, to enable Block Storage service:
+## By default Kolla Ansible provides a bare compute kit, however it does provide support for a vast selection of additional services. To ##enable them, set enable_* to “yes” For example, to enable Block Storage service:
 ## Kolla now supports many OpenStack services, there is a list of available services. For more information about service configuration, Please ##refer to the Services Reference Guide.
 
 enable_openstack_core: "yes"
@@ -82,26 +86,42 @@ enable_rabbitmq: "{{ 'yes' if om_rpc_transport == 'rabbit' or om_notify_transpor
 ## The following assumes the use of the multinode inventory. If using a different inventory, such as all-in-one, replace the -i argument ##accordingly.
 ## For deployment or evaluation, run:
 ## 1-Bootstrap servers with kolla deploy dependencies:
+
 kolla-ansible -i ./all-in-one bootstrap-servers
+
 ## 2- Do pre-deployment checks for hosts
+
 kolla-ansible -i ./all-in-one prechecks
+
 ## 3- Finally proceed to actual OpenStack deployment:
+
 kolla-ansible -i ./all-in-one deploy
+
 ## When this playbook finishes, OpenStack should be up, running and functional!
 ## Using OpenStack
 ## 1- Install the OpenStack CLI client:
+
 pip install python3-openstackclient
+
 ## or
+
 pip install python-openstackclient
+
 ## 2- OpenStack requires an openrc file where credentials for admin user are set. To generate this file:
+
 kolla-ansible post-deploy
 . /etc/kolla/admin-openrc.sh
+
 ## to access horizon after deployment we need to access horizon container then change ServerName to localhost
+
 vi /etc/httpd/conf/httpd.conf
 ServerName localhost
 exit
+
 ## then exit the container and restart it
+
 docker container restart <container ID of horizon>
+
 ## to access horizon get ip address with assigned on kolla_internal_vip_address from global.yml file
 ## to get credentials run
 cat /etc/kolla/admin-openrc.sh
